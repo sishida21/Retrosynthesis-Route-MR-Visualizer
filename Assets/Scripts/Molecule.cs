@@ -4,14 +4,20 @@ using UnityEngine;
 using OpenBabel;
 using Unity.VisualScripting;
 
-public class MoleculeCreator : MonoBehaviour
+public class Molecule : MonoBehaviour
 {
-    public string smilesString = "CC(=O)Oc1ccccc1C(=O)O";
+    public string smilesString; // = "CC(=O)Oc1ccccc1C(=O)O";
     public float moleculeScale = 0.1f;
     public float distanceFromCamera = 2.0f;
+    public GameObject moleculeObject;
 
     // Start is called before the first frame update
     void Start()
+    {
+        CreateMoleculeObjects();
+    }
+
+    public void CreateMoleculeObjects()
     {
         OBConversion conv = new OBConversion();
         conv.SetInFormat("smi");
@@ -30,12 +36,9 @@ public class MoleculeCreator : MonoBehaviour
             forceField.GetCoordinates(mol);
         }
 
-        CreateMoleculeObjects(mol);
-    }
-
-    private void CreateMoleculeObjects(OBMol mol)
-    {
-        GameObject moleculeObject = new GameObject("Molecule");
+        //GameObject moleculeObject = Instantiate(NodePrefab);
+        moleculeObject = new GameObject(smilesString);
+        moleculeObject.name = smilesString;
         moleculeObject.transform.SetParent(transform);
 
         List<GameObject> atomObjects = new List<GameObject>();
@@ -66,7 +69,6 @@ public class MoleculeCreator : MonoBehaviour
         moleculeObject.transform.localScale = new Vector3(moleculeScale, moleculeScale, moleculeScale);
         moleculeObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * distanceFromCamera;
         Debug.Log("Molecule creation complete");
-
     }
     private Color GetElementColor(string element)
     {
