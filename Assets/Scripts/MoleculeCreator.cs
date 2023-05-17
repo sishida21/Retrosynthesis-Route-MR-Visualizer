@@ -3,22 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using OpenBabel;
 using Unity.VisualScripting;
+using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.Input;
 
-public class Molecule : MonoBehaviour
+public class MoleculeCreator: MonoBehaviour
 {
-    public string smilesString; // = "CC(=O)Oc1ccccc1C(=O)O";
-    public float moleculeScale = 0.1f;
-    public float distanceFromCamera = 2.0f;
-    public GameObject moleculeObject;
+    //public string smilesString; // = "CC(=O)Oc1ccccc1C(=O)O";
+    //public string smilesString = "OC(Cn1cncn1)(Cn1cncn1)c1ccc(F)cc1F";
+    //private float moleculeScale = 0.1f;
+    //private float distanceFromCamera = 2.0f;
+    //public GameObject moleculeObject;
 
     // Start is called before the first frame update
     void Start()
     {
-        CreateMoleculeObjects();
+        //CreateMolecule(smilesString);
     }
 
-    public void CreateMoleculeObjects()
+    public GameObject CreateMolecule(string smilesString)
     {
+        GameObject moleculeObject = new GameObject(smilesString);
+        moleculeObject.name = smilesString;
+        moleculeObject.transform.SetParent(transform);
+
         OBConversion conv = new OBConversion();
         conv.SetInFormat("smi");
         OBMol mol = new OBMol();
@@ -28,18 +35,13 @@ public class Molecule : MonoBehaviour
         OBBuilder builder = new OBBuilder();
         builder.Build(mol);
 
-        OBForceField forceField = OBForceField.FindForceField("mmff94");
+        OBForceField forceField = OBForceField.FindForceField("mmff94"); // mmff94, UFF
         if (forceField != null )
         {
             forceField.Setup(mol);
             forceField.SteepestDescent(500);
             forceField.GetCoordinates(mol);
         }
-
-        //GameObject moleculeObject = Instantiate(NodePrefab);
-        moleculeObject = new GameObject(smilesString);
-        moleculeObject.name = smilesString;
-        moleculeObject.transform.SetParent(transform);
 
         List<GameObject> atomObjects = new List<GameObject>();
         for (int i = 1; i <= mol.NumAtoms(); ++i)
@@ -66,9 +68,15 @@ public class Molecule : MonoBehaviour
             }
         }
 
+        float moleculeScale = 0.1f;
         moleculeObject.transform.localScale = new Vector3(moleculeScale, moleculeScale, moleculeScale);
-        moleculeObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * distanceFromCamera;
+        //moleculeObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * distanceFromCamera;
+        moleculeObject.AddComponent<BoxCollider>();
+        moleculeObject.AddComponent<ObjectManipulator>();
+        moleculeObject.AddComponent<NearInteractionGrabbable>();
         Debug.Log("Molecule creation complete");
+
+        return moleculeObject;
     }
     private Color GetElementColor(string element)
     {

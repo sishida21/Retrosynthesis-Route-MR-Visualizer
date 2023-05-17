@@ -39,6 +39,7 @@ public class NetworkVisualizer : MonoBehaviour
 {
     public NodeCreator nodeCreator;
     public EdgeCreator edgeCreator;
+    public MoleculeCreator molCreator;
 
     public Dictionary<string, GameObject> nodeLookup = new Dictionary<string, GameObject>();
     Dictionary<string, Node> nodeDataLookup = new Dictionary<string, Node>();
@@ -52,8 +53,8 @@ public class NetworkVisualizer : MonoBehaviour
 
     public void InitializeData()
     {
-        string path = "Assets/Resources/JSON/minimum_network.json";
-        Root root = LoadJsonData(path);
+        //string fname = "Assets/Resources/JSON/minimum_network.json";
+        Root root = LoadJsonData("minimum_network");
 
         foreach (Node node in root.dataGraph.nodes)
         {
@@ -68,25 +69,27 @@ public class NetworkVisualizer : MonoBehaviour
 
         string rootId = root.dataGraph.nodes[0].id; // Assuming the first node is the root
         Debug.Log(rootId);
-        PositionNodes(rootId, 0, 0);
+        GameObject molecule = molCreator.CreateMolecule(rootId);
+        //PositionNodes(rootId, 0, 0);
 
-        foreach (Node node in root.dataGraph.nodes)
-        {
-            GameObject nodeObj = nodeCreator.CreateNode(node.id);
-            nodeLookup.Add(node.id, nodeObj);
-        }
+        //foreach (Node node in root.dataGraph.nodes)
+        //{
+        //    GameObject nodeObj = nodeCreator.CreateNode(node.id);
+        //    nodeLookup.Add(node.id, nodeObj);
+        //}
 
-        foreach (Edge edge in root.dataGraph.edges)
-        {
-            GameObject source = nodeLookup[edge.from];
-            GameObject target = nodeLookup[edge.to];
-            edgeCreator.CreateEdge(source, target);
-        }
+        //foreach (Edge edge in root.dataGraph.edges)
+        //{
+        //    GameObject source = nodeLookup[edge.from];
+        //    GameObject target = nodeLookup[edge.to];
+        //    edgeCreator.CreateEdge(source, target);
+        //}
     }
 
-    private Root LoadJsonData(string filePath)
+    private Root LoadJsonData(string fileName)
     {
-        string jsonData = File.ReadAllText(filePath);
+        //string jsonData = File.ReadAllText(filePath);
+        string jsonData = Resources.Load<TextAsset>(fileName).text;
         Root root = JsonUtility.FromJson<Root>(jsonData);
         return root;
     }

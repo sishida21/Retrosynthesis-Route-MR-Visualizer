@@ -5,7 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public NetworkVisualizer networkVisualier;
-    public float distanceFromCenter = 5.0f;
+    public float distanceFromCenter = 2.0f;
 
     void LateUpdate()
     {
@@ -21,6 +21,7 @@ public class CameraController : MonoBehaviour
 
         foreach(GameObject node in networkVisualier.nodeLookup.Values)
         {
+            Debug.Log(node.transform.position);
             center += node.transform.position;
             count++;
         }
