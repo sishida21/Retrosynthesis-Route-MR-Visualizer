@@ -1,18 +1,13 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using OpenBabel;
-using Unity.VisualScripting;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.Input;
 
 public class MoleculeCreator: MonoBehaviour
 {
-    //public string smilesString; // = "CC(=O)Oc1ccccc1C(=O)O";
-    //public string smilesString = "OC(Cn1cncn1)(Cn1cncn1)c1ccc(F)cc1F";
-    //private float moleculeScale = 0.1f;
-    //private float distanceFromCamera = 2.0f;
-    //public GameObject moleculeObject;
+    private float moleculeScale = 0.1f;
+    public GameObject textPrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -68,12 +63,25 @@ public class MoleculeCreator: MonoBehaviour
             }
         }
 
-        float moleculeScale = 0.1f;
-        moleculeObject.transform.localScale = new Vector3(moleculeScale, moleculeScale, moleculeScale);
+        moleculeObject.transform.localScale = Vector3.one * moleculeScale;
         //moleculeObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * distanceFromCamera;
-        moleculeObject.AddComponent<BoxCollider>();
+        Bounds bounds = new Bounds(atomObjects[0].transform.position, Vector3.zero);
+        foreach (GameObject atom in atomObjects)
+        {
+            SphereCollider collider = atom.GetComponent<SphereCollider>();
+            if (collider != null)
+            {
+                Bounds atomBounds = new Bounds(atom.transform.position, Vector3.one * collider.radius * 2 * atom.transform.lossyScale.x);
+                bounds.Encapsulate(atomBounds);
+            }
+        }
+        BoxCollider boxCollider = moleculeObject.AddComponent<BoxCollider>();
+        boxCollider.center = moleculeObject.transform.InverseTransformPoint(bounds.center);
+        boxCollider.size = moleculeObject.transform.InverseTransformVector(bounds.size);
         moleculeObject.AddComponent<ObjectManipulator>();
         moleculeObject.AddComponent<NearInteractionGrabbable>();
+        DisplayInteraction interaction = moleculeObject.AddComponent<DisplayInteraction>();
+        interaction.textPrefab = textPrefab;
         Debug.Log("Molecule creation complete");
 
         return moleculeObject;
