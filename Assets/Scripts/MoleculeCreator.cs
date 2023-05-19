@@ -26,7 +26,7 @@ public class MoleculeCreator: MonoBehaviour
         OBMol mol = new OBMol();
         conv.ReadString(mol, smilesString);
 
-        conv.SetOutFormat("pdb");
+        conv.SetOutFormat("mol");
         OBBuilder builder = new OBBuilder();
         builder.Build(mol);
 
@@ -75,6 +75,8 @@ public class MoleculeCreator: MonoBehaviour
                 bounds.Encapsulate(atomBounds);
             }
         }
+        Rigidbody rb = moleculeObject.AddComponent<Rigidbody>();
+        rb.isKinematic = true;
         BoxCollider boxCollider = moleculeObject.AddComponent<BoxCollider>();
         boxCollider.center = moleculeObject.transform.InverseTransformPoint(bounds.center);
         boxCollider.size = moleculeObject.transform.InverseTransformVector(bounds.size);
