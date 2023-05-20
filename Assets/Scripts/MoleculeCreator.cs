@@ -3,11 +3,13 @@ using UnityEngine;
 using OpenBabel;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.Input;
+using Unity.VisualScripting;
 
 public class MoleculeCreator: MonoBehaviour
 {
     private float moleculeScale = 0.1f;
     public GameObject textPrefab;
+    public GameObject nodeSphere;
 
     // Start is called before the first frame update
     void Start()
@@ -75,6 +77,9 @@ public class MoleculeCreator: MonoBehaviour
                 bounds.Encapsulate(atomBounds);
             }
         }
+        GameObject sphere = createTransparentSphere(bounds);
+        sphere.transform.SetParent(moleculeObject.transform);
+
         Rigidbody rb = moleculeObject.AddComponent<Rigidbody>();
         rb.isKinematic = true;
         BoxCollider boxCollider = moleculeObject.AddComponent<BoxCollider>();
@@ -87,6 +92,16 @@ public class MoleculeCreator: MonoBehaviour
         Debug.Log("Molecule creation complete");
 
         return moleculeObject;
+    }
+
+    private GameObject createTransparentSphere(Bounds bounds)
+    {
+        GameObject sphere = Instantiate(nodeSphere);
+        sphere.transform.position = bounds.center;
+        float maxScale = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 1.3f;
+        sphere.transform.localScale = Vector3.one * maxScale;
+        //sphereMaterial.color = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+        return sphere;
     }
     private Color GetElementColor(string element)
     {
