@@ -11,6 +11,12 @@ public class MoleculeCreator: MonoBehaviour
     public GameObject textPrefab;
     public GameObject nodeSphere;
 
+    public struct Mol3D
+    {
+        public GameObject objects;
+        public Bounds bounds;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,7 +26,6 @@ public class MoleculeCreator: MonoBehaviour
     public GameObject CreateMolecule(string smilesString, string nodeId)
     {
         GameObject moleculeObject = new GameObject(smilesString);
-        moleculeObject.name = smilesString;
         moleculeObject.transform.SetParent(transform);
 
         OBConversion conv = new OBConversion();
@@ -30,7 +35,6 @@ public class MoleculeCreator: MonoBehaviour
         OBBuilder builder = new OBBuilder();
         builder.Build(mol);
 
-
         OBForceField forceField = OBForceField.FindForceField("mmff94"); // mmff94, UFF
         if (forceField != null )
         {
@@ -38,62 +42,19 @@ public class MoleculeCreator: MonoBehaviour
             forceField.SteepestDescent(500);
             forceField.GetCoordinates(mol);
         }
-
-        List<GameObject> atomObjects = new List<GameObject>();
-        for (int i = 1; i <= mol.NumAtoms(); ++i)
-        {
-            OBAtom atom = mol.GetAtom(i);
-            string element = GetElementSymbol(atom.GetAtomicNum());
-            Vector3 position = new Vector3((float)atom.GetX(), (float)atom.GetY(), (float)atom.GetZ());
-            GameObject atomObject = CreateAtomObject(element, position);
-            atomObject.transform.SetParent(moleculeObject.transform);
-            atomObjects.Add(atomObject);
-        }
-        // Create bond objects.
-        for (int i = 0; i < mol.NumBonds(); ++i)
-        {
-            OBBond bond = mol.GetBond(i);
-            uint start = bond.GetBeginAtomIdx();
-            uint end = bond.GetEndAtomIdx();
-            uint order = bond.GetBondOrder();
-            List<GameObject> bondObjects = CreateBondObjects(atomObjects[(int)start - 1].transform.position, atomObjects[(int)end - 1].transform.position, order);
-
-            foreach (GameObject bondObject in bondObjects)
-            {
-                bondObject.transform.SetParent(moleculeObject.transform);
-            }
-        }
-
-        moleculeObject.transform.localScale = Vector3.one * moleculeScale;
-        Bounds bounds = new Bounds(atomObjects[0].transform.position, Vector3.zero);
-        foreach (GameObject atom in atomObjects)
-        {
-            SphereCollider collider = atom.GetComponent<SphereCollider>();
-            if (collider != null)
-            {
-                Bounds atomBounds = new Bounds(atom.transform.position, Vector3.one * collider.radius * 2 * atom.transform.lossyScale.x);
-                bounds.Encapsulate(atomBounds);
-            }
-        }
-        GameObject sphere = createTransparentSphere(bounds);
+        Mol3D mol3d = build3DMolecule(mol);
+        mol3d.objects.transform.SetParent(moleculeObject.transform);
+        GameObject sphere = createTransparentSphere(mol3d.bounds);
         sphere.transform.SetParent(moleculeObject.transform);
 
-        string pngPath = draw2DMolecule(smilesString, nodeId);
-        Texture2D texture = PngToTex2D(pngPath);
-        GameObject pngObj = new GameObject("Png_" + nodeId);
-        pngObj.transform.SetParent(moleculeObject.transform);
-        pngObj.transform.localScale = Vector3.one * 2.0f;
-        pngObj.transform.position = bounds.center;
-        pngObj.AddComponent<SpriteRenderer>();
-        Sprite sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
-        SpriteRenderer renderer = pngObj.GetComponent<SpriteRenderer>();
-        renderer.sprite = sprite;
+        GameObject mol2d = draw2DMolecule(smilesString, nodeId, mol3d.bounds.center);
+        mol2d.transform.SetParent(moleculeObject.transform);
 
         Rigidbody rb = moleculeObject.AddComponent<Rigidbody>();
         rb.isKinematic = true;
         BoxCollider boxCollider = moleculeObject.AddComponent<BoxCollider>();
-        boxCollider.center = moleculeObject.transform.InverseTransformPoint(bounds.center);
-        boxCollider.size = moleculeObject.transform.InverseTransformVector(bounds.size);
+        boxCollider.center = moleculeObject.transform.InverseTransformPoint(mol3d.bounds.center);
+        boxCollider.size = moleculeObject.transform.InverseTransformVector(mol3d.bounds.size);
         moleculeObject.AddComponent<ObjectManipulator>();
         moleculeObject.AddComponent<NearInteractionGrabbable>();
         DisplayInteraction interaction = moleculeObject.AddComponent<DisplayInteraction>();
@@ -116,7 +77,55 @@ public class MoleculeCreator: MonoBehaviour
         return texture;
     }
 
-    private string draw2DMolecule(string smilesString, string nodeId)
+    private Mol3D build3DMolecule(OBMol mol)
+    {
+        GameObject moleculeObject = new GameObject("3D_molecule");
+        moleculeObject.tag = "3dMol";
+
+        List<GameObject> atomObjects = new List<GameObject>();
+        for (int i = 1; i <= mol.NumAtoms(); ++i)
+        {
+            OBAtom atom = mol.GetAtom(i);
+            string element = GetElementSymbol(atom.GetAtomicNum());
+            Vector3 position = new Vector3((float)atom.GetX(), (float)atom.GetY(), (float)atom.GetZ());
+            GameObject atomObject = CreateAtomObject(element, position);
+            atomObject.transform.SetParent(moleculeObject.transform);
+            atomObjects.Add(atomObject);
+        }
+
+        List<GameObject> bondObjects;
+        for (int i = 0; i < mol.NumBonds(); ++i)
+        {
+            OBBond bond = mol.GetBond(i);
+            uint start = bond.GetBeginAtomIdx();
+            uint end = bond.GetEndAtomIdx();
+            uint order = bond.GetBondOrder();
+            bondObjects = CreateBondObjects(atomObjects[(int)start - 1].transform.position, atomObjects[(int)end - 1].transform.position, order);
+            foreach (GameObject bondObject in bondObjects)
+            {
+                bondObject.transform.SetParent(moleculeObject.transform);
+            }
+        }
+
+        moleculeObject.transform.localScale = Vector3.one * moleculeScale;
+
+        Bounds bounds = new Bounds(atomObjects[0].transform.position, Vector3.zero);
+        foreach (GameObject atom in atomObjects)
+        {
+            SphereCollider collider = atom.GetComponent<SphereCollider>();
+            if (collider != null)
+            {
+                Bounds atomBounds = new Bounds(atom.transform.position, Vector3.one * collider.radius * 2 * atom.transform.lossyScale.x);
+                bounds.Encapsulate(atomBounds);
+            }
+        }
+        Mol3D mol3d;
+        mol3d.objects = moleculeObject;
+        mol3d.bounds = bounds;
+        return mol3d;
+    }
+
+    private GameObject draw2DMolecule(string smilesString, string nodeId, Vector3 position)
     {
         OBConversion conv = new OBConversion();
         conv.SetInAndOutFormats("smi", "_png2");
@@ -126,10 +135,29 @@ public class MoleculeCreator: MonoBehaviour
         conv.AddOption("p", OBConversion.Option_type.OUTOPTIONS, "500");
         conv.AddOption("b", OBConversion.Option_type.OUTOPTIONS, "none");
         conv.AddOption("t", OBConversion.Option_type.OUTOPTIONS);
+        conv.AddOption("m", OBConversion.Option_type.OUTOPTIONS);
         conv.WriteFile(mol, filePath);
         conv.CloseOutFile();
-        return filePath;
+
+        Texture2D texture = PngToTex2D(filePath);
+        GameObject pngObj = new GameObject("2D_molecule");
+        pngObj.tag = "2dMol";
+        if (mol.NumAtoms() > 7)
+        {
+            pngObj.transform.localScale = Vector3.one * moleculeScale * 2.5f;
+        } else
+        {
+            pngObj.transform.localScale = Vector3.one * moleculeScale * 1.0f;
+        }
+        pngObj.transform.position = position;
+        pngObj.AddComponent<SpriteRenderer>();
+        Sprite sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
+        SpriteRenderer renderer = pngObj.GetComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+
+        return pngObj;
     }
+
     private GameObject createTransparentSphere(Bounds bounds)
     {
         GameObject sphere = Instantiate(nodeSphere);
