@@ -3,7 +3,7 @@ using UnityEngine;
 using OpenBabel;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.Input;
-using Unity.VisualScripting;
+using System.IO;
 
 public class MoleculeCreator: MonoBehaviour
 {
@@ -17,20 +17,19 @@ public class MoleculeCreator: MonoBehaviour
         //CreateMolecule(smilesString);
     }
 
-    public GameObject CreateMolecule(string smilesString)
+    public GameObject CreateMolecule(string smilesString, string nodeId)
     {
         GameObject moleculeObject = new GameObject(smilesString);
         moleculeObject.name = smilesString;
         moleculeObject.transform.SetParent(transform);
 
         OBConversion conv = new OBConversion();
-        conv.SetInFormat("smi");
+        conv.SetInAndOutFormats("smi", "mol");
         OBMol mol = new OBMol();
         conv.ReadString(mol, smilesString);
-
-        conv.SetOutFormat("mol");
         OBBuilder builder = new OBBuilder();
         builder.Build(mol);
+
 
         OBForceField forceField = OBForceField.FindForceField("mmff94"); // mmff94, UFF
         if (forceField != null )
@@ -66,7 +65,6 @@ public class MoleculeCreator: MonoBehaviour
         }
 
         moleculeObject.transform.localScale = Vector3.one * moleculeScale;
-        //moleculeObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * distanceFromCamera;
         Bounds bounds = new Bounds(atomObjects[0].transform.position, Vector3.zero);
         foreach (GameObject atom in atomObjects)
         {
@@ -79,6 +77,17 @@ public class MoleculeCreator: MonoBehaviour
         }
         GameObject sphere = createTransparentSphere(bounds);
         sphere.transform.SetParent(moleculeObject.transform);
+
+        string pngPath = draw2DMolecule(smilesString, nodeId);
+        Texture2D texture = PngToTex2D(pngPath);
+        GameObject pngObj = new GameObject("Png_" + nodeId);
+        pngObj.transform.SetParent(moleculeObject.transform);
+        pngObj.transform.localScale = Vector3.one * 2.0f;
+        pngObj.transform.position = bounds.center;
+        pngObj.AddComponent<SpriteRenderer>();
+        Sprite sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
+        SpriteRenderer renderer = pngObj.GetComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
 
         Rigidbody rb = moleculeObject.AddComponent<Rigidbody>();
         rb.isKinematic = true;
@@ -94,6 +103,33 @@ public class MoleculeCreator: MonoBehaviour
         return moleculeObject;
     }
 
+    private Texture2D PngToTex2D(string path)
+    {
+        BinaryReader binaryReader = new BinaryReader(new FileStream(path, FileMode.Open));
+        byte[] rb = binaryReader.ReadBytes((int)binaryReader.BaseStream.Length);
+        binaryReader.Close();
+        int pos = 16, width = 0, height = 0;
+        for (int i = 0; i < 4; i++) width = width * 256 + rb[pos++];
+        for (int i = 0; i < 4; i++) height = height * 256 + rb[pos++];
+        Texture2D texture = new Texture2D(width, height);
+        texture.LoadImage(rb);
+        return texture;
+    }
+
+    private string draw2DMolecule(string smilesString, string nodeId)
+    {
+        OBConversion conv = new OBConversion();
+        conv.SetInAndOutFormats("smi", "_png2");
+        OBMol mol = new OBMol();
+        conv.ReadString(mol, smilesString);
+        string filePath = Path.Combine(Application.dataPath, "Resources/images/", nodeId) + ".png";
+        conv.AddOption("p", OBConversion.Option_type.OUTOPTIONS, "500");
+        conv.AddOption("b", OBConversion.Option_type.OUTOPTIONS, "none");
+        conv.AddOption("t", OBConversion.Option_type.OUTOPTIONS);
+        conv.WriteFile(mol, filePath);
+        conv.CloseOutFile();
+        return filePath;
+    }
     private GameObject createTransparentSphere(Bounds bounds)
     {
         GameObject sphere = Instantiate(nodeSphere);
@@ -103,6 +139,7 @@ public class MoleculeCreator: MonoBehaviour
         //sphereMaterial.color = new Color(1.0f, 1.0f, 1.0f, 0.3f);
         return sphere;
     }
+
     private Color GetElementColor(string element)
     {
         switch (element)
@@ -150,7 +187,7 @@ public class MoleculeCreator: MonoBehaviour
         for (int i = 0; i < order; i++)
         {
             Vector3 offset = Vector3.zero;
-            float bondOffset = 0.2f; // オフセット量を調整できます
+            float bondOffset = 0.2f;
     
             if (order > 1)
             {
@@ -169,9 +206,6 @@ public class MoleculeCreator: MonoBehaviour
             bondObject.transform.position = bondCenter;
             bondObject.transform.localScale = new Vector3(0.1f, bondLength / 2, 0.1f);
             bondObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, bondDirection);
-    
-            // 結合次数に応じた色を設定することもできます。
-            // bondObject.GetComponent<Renderer>().material.color = Color.grey;
     
             bondObjects.Add(bondObject);
         }
@@ -203,8 +237,6 @@ public class MoleculeCreator: MonoBehaviour
         }
         return ""; // Unknown element
     }
-
-
 
     // Update is called once per frame
     void Update()
