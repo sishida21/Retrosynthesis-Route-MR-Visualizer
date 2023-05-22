@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - 3dMol
+  - 2dMol
+  - MolManager
+  - MolContainer
   layers:
   - Default
   - TransparentFX

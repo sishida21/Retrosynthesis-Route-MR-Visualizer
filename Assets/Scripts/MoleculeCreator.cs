@@ -26,6 +26,7 @@ public class MoleculeCreator: MonoBehaviour
     public GameObject CreateMolecule(string smilesString, string nodeId)
     {
         GameObject moleculeObject = new GameObject(smilesString);
+        moleculeObject.tag = "MolContainer";
         moleculeObject.transform.SetParent(transform);
 
         OBConversion conv = new OBConversion();
@@ -142,6 +143,7 @@ public class MoleculeCreator: MonoBehaviour
         Texture2D texture = PngToTex2D(filePath);
         GameObject pngObj = new GameObject("2D_molecule");
         pngObj.tag = "2dMol";
+        pngObj.SetActive(false);
         if (mol.NumAtoms() > 7)
         {
             pngObj.transform.localScale = Vector3.one * moleculeScale * 2.5f;

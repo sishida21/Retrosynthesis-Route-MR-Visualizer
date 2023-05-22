@@ -31,8 +31,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6814408778167276549}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.284366, y: 0.05, z: -8.35277}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 0.01}
+  m_LocalPosition: {x: 4.2497, y: 0.1155, z: -8.35277}
+  m_LocalScale: {x: 0.66054004, y: 0.8253668, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4392420168661458124}
@@ -280,6 +280,10 @@ PrefabInstance:
 '
       objectReference: {fileID: 0}
     - target: {fileID: 114000010164638790, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000010164638790, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
       propertyPath: m_FontData.m_Alignment
       value: 0
       objectReference: {fileID: 0}
@@ -389,23 +393,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 224000014204859762, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 450
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 224000014204859762, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 450
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 224000014204859762, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9196322
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224000014204859762, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9196322
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224000014204859762, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9196322
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224000014204859762, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -413,7 +417,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 224000014204859762, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -166
+      value: -165
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: df8fcda444f30864dadb44d21f057e61, type: 3}
