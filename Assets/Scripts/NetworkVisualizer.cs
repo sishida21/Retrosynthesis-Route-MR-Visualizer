@@ -68,8 +68,10 @@ public class NetworkVisualizer : MonoBehaviour
     public MoleculeCreator molCreator;
     public ReactionCreator reactionCreator;
     public float range = 2;
+    private Root root;
 
     public Dictionary<string, GameObject> nodeObjectLookup = new Dictionary<string, GameObject>();
+    Dictionary<string, GameObject> edgeObjectLookup = new Dictionary<string, GameObject>();
     Dictionary<string, DataNode> nodeDataLookup = new Dictionary<string, DataNode>();
     Dictionary<string, DispNode> nodeDispDataLookup = new Dictionary<string, DispNode>();
 
@@ -81,7 +83,7 @@ public class NetworkVisualizer : MonoBehaviour
 
     public void InitializeData()
     {
-        Root root = LoadJsonData("minimum_network");
+        root = LoadJsonData("minimum_network");
 
         foreach (DataNode node in root.dataGraph.nodes)
         {
@@ -109,6 +111,7 @@ public class NetworkVisualizer : MonoBehaviour
             GameObject source = nodeObjectLookup[edge.from];
             GameObject target = nodeObjectLookup[edge.to];
             GameObject edgeObj = edgeCreator.CreateEdge(source, target);
+            edgeObjectLookup.Add(edge.id, edgeObj);
         }
     }
 
@@ -137,6 +140,12 @@ public class NetworkVisualizer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        foreach (DispEdge edge in root.dispGraph.edges)
+        {
+            LineRenderer line = edgeObjectLookup[edge.id].GetComponent<LineRenderer>();
+            line.SetPosition(0, nodeObjectLookup[edge.from].transform.position);
+            line.SetPosition(1, nodeObjectLookup[edge.to].transform.position);
+        }
         
     }
 }
