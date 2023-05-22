@@ -1,29 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine;
 
 public class EdgeCreator : MonoBehaviour
 {
     public GameObject CreateEdge(GameObject source, GameObject target)
     {
-        GameObject edge = new GameObject("Edge_" + source.name + "_" + target.name);
-        edge.transform.position = source.transform.position;
+        GameObject edge = new GameObject("Edge" + source.name + "_" + target.name);
+        edge.transform.SetParent(transform);
+        LineRenderer line = edge.AddComponent<LineRenderer>();
+        edge.transform.localScale = Vector3.one * 0.1f;
 
-        LineRenderer lr = edge.AddComponent<LineRenderer>();
-        lr.SetPosition(0, source.transform.position);
-        lr.SetPosition(1, target.transform.position);
+        Material edgeMaterial = new Material(Shader.Find("Standard"));
+        edgeMaterial.color = Color.gray;
+
+        line.material = edgeMaterial;
+        line.startWidth = 0.01f;
+        line.endWidth = 0.01f;
+        line.positionCount = 2;
+
+        line.SetPosition(0, source.transform.position);
+        line.SetPosition(1, target.transform.position);
 
         return edge;
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
+

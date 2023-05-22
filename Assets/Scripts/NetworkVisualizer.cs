@@ -1,19 +1,38 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.Rendering;
+using System.IO;
+using UnityEditor;
+
 
 [System.Serializable]
-public class Node
+public class DataNode
 {
-    public string id;
-    public string smiles;
+    public string id;  // smiles string
+    public bool terminal;  // chemical
+    public float ffScore;  // reaction
+    public float templateScore;  // reaction
+    public float numExamples;  // reaction
+    public string type;  // chemical / reaction
 }
 
 [System.Serializable]
-public class Edge
+public class DataEdge
+{
+    public string id;
+    public string from;  // smiles string
+    public string to;  // smiles string
+}
+
+[System.Serializable]
+public class DispNode
+{
+    public string id;
+    public string smiles;
+    public string type;  // chemical / reaction
+}
+
+[System.Serializable]
+public class DispEdge
 {
     public string id;
     public string from;
@@ -23,27 +42,36 @@ public class Edge
 [System.Serializable]
 public class DataGraph
 {
-    public List<Node> nodes;
-    public List<Edge> edges;
+    public List<DataNode> nodes;
+    public List<DataEdge> edges;
+}
+
+
+[System.Serializable]
+public class DispGraph
+{
+    public List<DispNode> nodes;
+    public List<DispEdge> edges;
 }
 
 [System.Serializable]
 public class Root
 {
     public DataGraph dataGraph;
-    public DataGraph dispGraph;
+    public DispGraph dispGraph;
     public int version;
 }
 
 public class NetworkVisualizer : MonoBehaviour
 {
-    public NodeCreator nodeCreator;
     public EdgeCreator edgeCreator;
     public MoleculeCreator molCreator;
+    public ReactionCreator reactionCreator;
+    public float range = 2;
 
-    public Dictionary<string, GameObject> nodeLookup = new Dictionary<string, GameObject>();
-    Dictionary<string, Node> nodeDataLookup = new Dictionary<string, Node>();
-    Dictionary<string, List<string>> adjacencyList = new Dictionary<string, List<string>>();
+    public Dictionary<string, GameObject> nodeObjectLookup = new Dictionary<string, GameObject>();
+    Dictionary<string, DataNode> nodeDataLookup = new Dictionary<string, DataNode>();
+    Dictionary<string, DispNode> nodeDispDataLookup = new Dictionary<string, DispNode>();
 
     // Start is called before the first frame update
     void Start()
@@ -53,37 +81,35 @@ public class NetworkVisualizer : MonoBehaviour
 
     public void InitializeData()
     {
-        //string fname = "Assets/Resources/JSON/minimum_network.json";
         Root root = LoadJsonData("minimum_network");
 
-        foreach (Node node in root.dataGraph.nodes)
+        foreach (DataNode node in root.dataGraph.nodes)
         {
             nodeDataLookup.Add(node.id, node);
-            adjacencyList.Add(node.id, new List<string>());
         }
 
-        foreach (Edge edge in root.dataGraph.edges)
+        foreach (DispNode node in root.dispGraph.nodes)
         {
-            adjacencyList[edge.from].Add(edge.to);
+            nodeDispDataLookup.Add(node.id, node);
+            if (node.type == "chemical")
+            {
+                GameObject molecule = molCreator.CreateMolecule(node.smiles, node.id);
+                PositionNodes(molecule);
+                nodeObjectLookup.Add(node.id, molecule);
+            } else  // type == reaction
+            {
+                GameObject reaction = reactionCreator.CreateTransparentSphere(node.id);
+                PositionNodes(reaction);
+                nodeObjectLookup.Add(node.id, reaction);
+            }
         }
 
-        string rootId = root.dataGraph.nodes[0].id; // Assuming the first node is the root
-        Debug.Log(rootId);
-        GameObject molecule = molCreator.CreateMolecule(rootId);
-        //PositionNodes(rootId, 0, 0);
-
-        //foreach (Node node in root.dataGraph.nodes)
-        //{
-        //    GameObject nodeObj = nodeCreator.CreateNode(node.id);
-        //    nodeLookup.Add(node.id, nodeObj);
-        //}
-
-        //foreach (Edge edge in root.dataGraph.edges)
-        //{
-        //    GameObject source = nodeLookup[edge.from];
-        //    GameObject target = nodeLookup[edge.to];
-        //    edgeCreator.CreateEdge(source, target);
-        //}
+        foreach (DispEdge edge in root.dispGraph.edges)
+        {
+            GameObject source = nodeObjectLookup[edge.from];
+            GameObject target = nodeObjectLookup[edge.to];
+            GameObject edgeObj = edgeCreator.CreateEdge(source, target);
+        }
     }
 
     private Root LoadJsonData(string fileName)
@@ -94,21 +120,19 @@ public class NetworkVisualizer : MonoBehaviour
         return root;
     }
 
-    private void PositionNodes(string nodeId, float x, float y)
+    private void PositionNodes(GameObject nodeObj)
     {
-        GameObject nodeObj = nodeCreator.CreateNode(nodeId);
-        nodeObj.transform.position = new Vector3(x, y, 0);
-
-        int childCount = adjacencyList[nodeId].Count;
-        for (int i = 0; i < childCount; i++)
-        {
-            PositionNodes(
-                adjacencyList[nodeId][i],
-                x + i - childCount / 2f,
-                y - 1);
-        }
+        float x = Random.Range(-range, range);
+        float y = Random.Range(-1, range);
+        nodeObj.transform.position = new Vector3(x, y, 3);
     }
 
+    private void OnApplicationQuit()
+    {
+        string dirPath = Path.Combine(Application.dataPath, "Resources/images/");
+        FileUtil.DeleteFileOrDirectory(dirPath);
+        Directory.CreateDirectory(dirPath);
+    }
 
     // Update is called once per frame
     void Update()

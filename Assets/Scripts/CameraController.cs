@@ -5,7 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public NetworkVisualizer networkVisualier;
-    public float distanceFromCenter = 2.0f;
+    public float distanceFromCenter = 5.0f;
 
     void LateUpdate()
     {
@@ -19,9 +19,8 @@ public class CameraController : MonoBehaviour
         Vector3 center = Vector3.zero;
         int count = 0;
 
-        foreach(GameObject node in networkVisualier.nodeLookup.Values)
+        foreach(GameObject node in networkVisualier.nodeObjectLookup.Values)
         {
-            Debug.Log(node.transform.position);
             center += node.transform.position;
             count++;
         }
@@ -32,17 +31,5 @@ public class CameraController : MonoBehaviour
         }
 
         return center;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

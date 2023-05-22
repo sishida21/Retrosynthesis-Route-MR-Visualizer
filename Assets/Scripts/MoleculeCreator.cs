@@ -164,7 +164,7 @@ public class MoleculeCreator: MonoBehaviour
     {
         GameObject sphere = Instantiate(nodeSphere);
         sphere.transform.position = bounds.center;
-        float maxScale = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 1.3f;
+        float maxScale = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 1.25f;
         sphere.transform.localScale = Vector3.one * maxScale;
         //sphereMaterial.color = new Color(1.0f, 1.0f, 1.0f, 0.3f);
         return sphere;
@@ -266,11 +266,5 @@ public class MoleculeCreator: MonoBehaviour
             return ElementSymbols[atomicNumber];
         }
         return ""; // Unknown element
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
