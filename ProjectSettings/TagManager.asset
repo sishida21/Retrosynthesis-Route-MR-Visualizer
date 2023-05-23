@@ -8,6 +8,7 @@ TagManager:
   - 2dMol
   - MolManager
   - MolContainer
+  - RxnContainer
   layers:
   - Default
   - TransparentFX

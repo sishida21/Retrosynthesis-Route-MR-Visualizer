@@ -48,13 +48,12 @@ public class MoleculeCreator: MonoBehaviour
         GameObject sphere = createTransparentSphere(mol3d.bounds);
         sphere.transform.SetParent(moleculeObject.transform);
 
-        GameObject mol2d = draw2DMolecule(smilesString, nodeId, mol3d.bounds.center);
+        GameObject mol2d = draw2DMolecule(smilesString, nodeId);
         mol2d.transform.SetParent(moleculeObject.transform);
 
         Rigidbody rb = moleculeObject.AddComponent<Rigidbody>();
         rb.isKinematic = true;
         BoxCollider boxCollider = moleculeObject.AddComponent<BoxCollider>();
-        boxCollider.center = moleculeObject.transform.InverseTransformPoint(mol3d.bounds.center);
         boxCollider.size = moleculeObject.transform.InverseTransformVector(mol3d.bounds.size);
         moleculeObject.AddComponent<ObjectManipulator>();
         moleculeObject.AddComponent<NearInteractionGrabbable>();
@@ -120,13 +119,14 @@ public class MoleculeCreator: MonoBehaviour
                 bounds.Encapsulate(atomBounds);
             }
         }
+        moleculeObject.transform.position = Vector3.zero - bounds.center;
         Mol3D mol3d;
         mol3d.objects = moleculeObject;
         mol3d.bounds = bounds;
         return mol3d;
     }
 
-    private GameObject draw2DMolecule(string smilesString, string nodeId, Vector3 position)
+    private GameObject draw2DMolecule(string smilesString, string nodeId)
     {
         OBConversion conv = new OBConversion();
         conv.SetInAndOutFormats("smi", "_png2");
@@ -151,7 +151,7 @@ public class MoleculeCreator: MonoBehaviour
         {
             pngObj.transform.localScale = Vector3.one * moleculeScale * 1.0f;
         }
-        pngObj.transform.position = position;
+        pngObj.transform.position = Vector3.zero;
         pngObj.AddComponent<SpriteRenderer>();
         Sprite sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
         SpriteRenderer renderer = pngObj.GetComponent<SpriteRenderer>();
@@ -163,7 +163,8 @@ public class MoleculeCreator: MonoBehaviour
     private GameObject createTransparentSphere(Bounds bounds)
     {
         GameObject sphere = Instantiate(nodeSphere);
-        sphere.transform.position = bounds.center;
+        //sphere.transform.position = bounds.center;
+        sphere.transform.position = Vector3.zero;
         float maxScale = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 1.25f;
         sphere.transform.localScale = Vector3.one * maxScale;
         //sphereMaterial.color = new Color(1.0f, 1.0f, 1.0f, 0.3f);

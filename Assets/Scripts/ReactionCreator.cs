@@ -8,6 +8,7 @@ public class ReactionCreator : MonoBehaviour
     public GameObject CreateTransparentSphere(string smilesString)
     {
         GameObject sphere = Instantiate(nodeSphere);
+        sphere.tag = "RxnContainer";
         sphere.transform.SetParent(transform);
         sphere.name = smilesString;
         sphere.transform.localScale = Vector3.one * 0.3f;

@@ -101,7 +101,7 @@ public class NetworkVisualizer : MonoBehaviour
 
     public void InitializeData()
     {
-        root = LoadJsonData("minimum_network2");
+        root = LoadJsonData("minimum_network");
 
         foreach (DataNode node in root.dataGraph.nodes)
         {
@@ -234,10 +234,10 @@ public class NetworkVisualizer : MonoBehaviour
     {
         foreach (DispEdge edge in root.dispGraph.edges)
         {
-            LineRenderer line = edgeObjectLookup[edge.id].GetComponent<LineRenderer>();
-            line.SetPosition(0, nodeObjectLookup[edge.from].transform.position);
-            line.SetPosition(1, nodeObjectLookup[edge.to].transform.position);
+            edgeCreator.UpdateEdgePosition(
+                edgeObjectLookup[edge.id],
+                nodeObjectLookup[edge.from],
+                nodeObjectLookup[edge.to]);
         }
-        
     }
 }
