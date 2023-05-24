@@ -10,6 +10,7 @@ public class ReactionCreator : MonoBehaviour
         GameObject sphere = Instantiate(nodeSphere);
         sphere.tag = "RxnContainer";
         sphere.transform.SetParent(transform);
+        sphere.transform.Rotate(new Vector3(0, 0, 90));
         sphere.name = smilesString;
         sphere.transform.localScale = Vector3.one * 0.3f;
 

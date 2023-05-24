@@ -25,7 +25,7 @@ public class MoleculeCreator: MonoBehaviour
 
     public GameObject CreateMolecule(string smilesString, string nodeId)
     {
-        GameObject moleculeObject = new GameObject(smilesString);
+        GameObject moleculeObject = new GameObject(nodeId);
         moleculeObject.tag = "MolContainer";
         moleculeObject.transform.SetParent(transform);
 
@@ -52,7 +52,7 @@ public class MoleculeCreator: MonoBehaviour
         mol2d.transform.SetParent(moleculeObject.transform);
 
         Rigidbody rb = moleculeObject.AddComponent<Rigidbody>();
-        rb.isKinematic = true;
+        rb.useGravity = false;
         BoxCollider boxCollider = moleculeObject.AddComponent<BoxCollider>();
         boxCollider.size = moleculeObject.transform.InverseTransformVector(mol3d.bounds.size);
         moleculeObject.AddComponent<ObjectManipulator>();

@@ -101,7 +101,7 @@ public class NetworkVisualizer : MonoBehaviour
 
     public void InitializeData()
     {
-        root = LoadJsonData("minimum_network");
+        root = LoadJsonData("minimum_network2");
 
         foreach (DataNode node in root.dataGraph.nodes)
         {
@@ -117,7 +117,7 @@ public class NetworkVisualizer : MonoBehaviour
                 nodeObjectLookup.Add(node.id, molecule);
             } else  // type == reaction
             {
-                GameObject reaction = reactionCreator.CreateTransparentSphere(node.smiles);
+                GameObject reaction = reactionCreator.CreateTransparentSphere(node.id);
                 nodeObjectLookup.Add(node.id, reaction);
             }
         }
@@ -164,9 +164,9 @@ public class NetworkVisualizer : MonoBehaviour
     public class ReactionNetwork
     {
         public NetworkNode rootNode;
-        public float verticalSpacing = 1.0f;
+        public float verticalSpacing = 1.2f;
         public float initialRadius = 2.0f;
-        public float radiusDecay = 0.75f;
+        public float radiusDecay = 0.6f;
 
         public ReactionNetwork(NetworkNode rootNode)
         {
@@ -193,17 +193,17 @@ public class NetworkVisualizer : MonoBehaviour
                 Vector3 newPosition;
                 if (node.children.Count == 1)
                 {
-                    newPosition = new Vector3(0, -verticalSpacing * currentDepth, 0);
+                    newPosition = new Vector3(0, -verticalSpacing, 0);
                 }
                 else
                 {
                     float angle = angleStep * i;
                     newPosition = new Vector3(
                         currentRadius * Mathf.Cos(angle),
-                        -verticalSpacing * currentDepth,
+                        -verticalSpacing,
                         currentRadius * Mathf.Sin(angle));
                 }
-                child.molObject.transform.localPosition = newPosition;
+                child.molObject.transform.position = node.molObject.transform.position + newPosition;
             }
 
             float nextRadius = currentRadius * radiusDecay;
@@ -216,7 +216,6 @@ public class NetworkVisualizer : MonoBehaviour
 
     private Root LoadJsonData(string fileName)
     {
-        //string jsonData = File.ReadAllText(filePath);
         string jsonData = Resources.Load<TextAsset>(fileName).text;
         Root root = JsonUtility.FromJson<Root>(jsonData);
         return root;
