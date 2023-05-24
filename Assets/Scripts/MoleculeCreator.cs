@@ -57,6 +57,7 @@ public class MoleculeCreator: MonoBehaviour
         boxCollider.size = moleculeObject.transform.InverseTransformVector(mol3d.bounds.size);
         moleculeObject.AddComponent<ObjectManipulator>();
         moleculeObject.AddComponent<NearInteractionGrabbable>();
+        moleculeObject.AddComponent<NodeForce>();
         DisplayInteraction interaction = moleculeObject.AddComponent<DisplayInteraction>();
         interaction.textPrefab = textPrefab;
         Debug.Log("Molecule creation complete");
