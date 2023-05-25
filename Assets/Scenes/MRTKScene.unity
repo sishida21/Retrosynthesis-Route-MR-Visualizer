@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36a80881b2a490c418afaa7fd5b2d1b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textPrefab: {fileID: 6814408778167276549, guid: d2209df63337c2442869dd3672509569, type: 3}
+  textPrefab: {fileID: 4947564431550615312, guid: d2209df63337c2442869dd3672509569, type: 3}
   nodeSphere: {fileID: 8235500599029586374, guid: 9825210ce6aa1ea4883730508a04c24f, type: 3}
 --- !u!1 &237147120
 GameObject:
@@ -370,6 +370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodeSphere: {fileID: 7558972179936895413, guid: 45bb4b757b342034ea8aa1c1c99d75cc, type: 3}
+  textPrefab: {fileID: 4947564431550615312, guid: d2209df63337c2442869dd3672509569, type: 3}
 --- !u!4 &725182524
 Transform:
   m_ObjectHideFlags: 0
@@ -460,6 +461,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textPrefab: {fileID: 0}
+  displayText: 
 --- !u!4 &931631936
 Transform:
   m_ObjectHideFlags: 0
@@ -816,7 +818,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   networkVisualier: {fileID: 1618279243}
-  distanceFromCenter: 7
+  distanceFromCenter: 5
 --- !u!1001 &2125327818
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,10 +1,11 @@
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 public class DisplayInteraction : MonoBehaviour, IMixedRealityPointerHandler
 {
     public GameObject textPrefab; // Assign in Inspector
+    public string displayText;
     private GameObject currentTextObject = null;
 
     public void OnPointerClicked(MixedRealityPointerEventData eventData)
@@ -36,15 +37,14 @@ public class DisplayInteraction : MonoBehaviour, IMixedRealityPointerHandler
 
         // Calculate the position to place the text
         float offset = collider.bounds.extents.magnitude; // half the "size" of the object
-        Vector3 textPosition = transform.position + transform.forward * offset;
+        Vector3 textPosition = transform.position + -2.0f * transform.up * offset + -1.2f * transform.forward * offset;
 
-        //GameObject textObject = Instantiate(textPrefab, transform.position + new Vector3(0.2f, 0, 0), Quaternion.identity);
         currentTextObject = Instantiate(textPrefab, textPosition, Quaternion.identity);
         currentTextObject.transform.SetParent(this.transform);
-        Text text = currentTextObject.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>();
-        if (text != null)
+        TextMeshProUGUI tmPro = currentTextObject.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        if (tmPro != null)
         {
-            text.text = this.gameObject.name;
+            tmPro.text = displayText;
         }
     }
 }

@@ -101,7 +101,7 @@ public class NetworkVisualizer : MonoBehaviour
 
     public void InitializeData()
     {
-        root = LoadJsonData("minimum_network2");
+        root = LoadJsonData("minimum_network");
 
         foreach (DataNode node in root.dataGraph.nodes)
         {
@@ -117,7 +117,7 @@ public class NetworkVisualizer : MonoBehaviour
                 nodeObjectLookup.Add(node.id, molecule);
             } else  // type == reaction
             {
-                GameObject reaction = reactionCreator.CreateTransparentSphere(node.id);
+                GameObject reaction = reactionCreator.CreateTransparentSphere(nodeDataLookup[node.smiles]);
                 nodeObjectLookup.Add(node.id, reaction);
             }
         }

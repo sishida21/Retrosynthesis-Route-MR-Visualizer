@@ -58,8 +58,6 @@ public class MoleculeCreator: MonoBehaviour
         moleculeObject.AddComponent<ObjectManipulator>();
         moleculeObject.AddComponent<NearInteractionGrabbable>();
         moleculeObject.AddComponent<NodeForce>();
-        DisplayInteraction interaction = moleculeObject.AddComponent<DisplayInteraction>();
-        interaction.textPrefab = textPrefab;
         Debug.Log("Molecule creation complete");
 
         return moleculeObject;
