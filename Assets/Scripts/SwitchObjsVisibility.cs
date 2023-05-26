@@ -18,11 +18,11 @@ public class SwitchObjsVisibility : MonoBehaviour
     {
         foreach (GameObject obj in objects2D)
         {
-            obj.SetActive(!is3DObjectActive);
+            obj.SetActive(is3DObjectActive);
         }
         foreach (GameObject obj in objects3D)
         {
-            obj.SetActive(is3DObjectActive);
+            obj.SetActive(!is3DObjectActive);
         }
         is3DObjectActive = !is3DObjectActive;
     }
