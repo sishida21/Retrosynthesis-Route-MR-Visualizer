@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using UnityEditor;
-using System.Net.Mime;
 
 [System.Serializable]
 public class DataNode
@@ -84,6 +83,7 @@ public class NetworkVisualizer : MonoBehaviour
     public float range = 2;
     private Root root;
     public NetworkNode rootNode;
+    public string jsonFileName = "large_network";
 
     public Dictionary<string, GameObject> nodeObjectLookup = new Dictionary<string, GameObject>();
     Dictionary<string, GameObject> edgeObjectLookup = new Dictionary<string, GameObject>();
@@ -101,7 +101,7 @@ public class NetworkVisualizer : MonoBehaviour
 
     public void InitializeData()
     {
-        root = LoadJsonData("minimum_network");
+        root = LoadJsonData(jsonFileName);
 
         foreach (DataNode node in root.dataGraph.nodes)
         {
@@ -165,7 +165,7 @@ public class NetworkVisualizer : MonoBehaviour
     {
         public NetworkNode rootNode;
         public float verticalSpacing = 1.2f;
-        public float initialRadius = 2.0f;
+        public float initialRadius = 6.0f;
         public float radiusDecay = 0.6f;
 
         public ReactionNetwork(NetworkNode rootNode)
@@ -181,10 +181,10 @@ public class NetworkVisualizer : MonoBehaviour
                 return;
             }
             rootNode.molObject.transform.position = Vector3.zero;
-            PlaceNode(rootNode, 1, initialRadius);
+            PlaceNode(rootNode, initialRadius);
         }
 
-        private void PlaceNode(NetworkNode node, float currentDepth, float currentRadius)
+        private void PlaceNode(NetworkNode node, float currentRadius)
         {
             float angleStep = 2 * Mathf.PI / node.children.Count;
             for (int i = 0; i < node.children.Count; i++)
@@ -209,7 +209,7 @@ public class NetworkVisualizer : MonoBehaviour
             float nextRadius = currentRadius * radiusDecay;
             for (int i = 0; i < node.children.Count;i++)
             {
-                PlaceNode(node.children[i], currentDepth + 1, nextRadius);
+                PlaceNode(node.children[i], nextRadius);
             }
         }
     }
