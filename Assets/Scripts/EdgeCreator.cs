@@ -10,7 +10,7 @@ public class EdgeCreator : MonoBehaviour
         edge.transform.localScale = Vector3.one * 0.1f;
 
         Material edgeMaterial = new Material(Shader.Find("Standard"));
-        edgeMaterial.color = Color.gray;
+        edgeMaterial.color = new Color(0.6f, 0.4f, 0.3f);
 
         line.material = edgeMaterial;
         line.startWidth = 0.01f;
