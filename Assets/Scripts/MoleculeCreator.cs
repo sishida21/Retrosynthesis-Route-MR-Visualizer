@@ -132,6 +132,7 @@ public class MoleculeCreator: MonoBehaviour
         OBMol mol = new OBMol();
         conv.ReadString(mol, smilesString);
         string filePath = Path.Combine(Application.dataPath, "Resources/images/", nodeId) + ".png";
+        // ref. https://open-babel.readthedocs.io/en/latest/FileFormats/PNG_2D_depiction.html
         conv.AddOption("p", OBConversion.Option_type.OUTOPTIONS, "500");
         conv.AddOption("b", OBConversion.Option_type.OUTOPTIONS, "none");
         conv.AddOption("t", OBConversion.Option_type.OUTOPTIONS);
