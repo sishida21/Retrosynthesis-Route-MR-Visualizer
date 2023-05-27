@@ -5,7 +5,7 @@ public class EdgeCreator : MonoBehaviour
     public GameObject CreateEdge(GameObject source, GameObject target)
     {
         GameObject edge = new GameObject("Edge" + source.name + "_" + target.name);
-        edge.transform.SetParent(transform);
+        //edge.transform.SetParent(transform);
         LineRenderer line = edge.AddComponent<LineRenderer>();
         edge.transform.localScale = Vector3.one * 0.1f;
 
@@ -33,21 +33,21 @@ public class EdgeCreator : MonoBehaviour
         if (source.tag == "MolContainer")
         {
             GameObject sourceSphere = source.transform.Find("NodeSpherePrefab(Clone)").gameObject;
-            sourceRadius = sourceSphere.transform.localScale.x / 2.0f;
+            sourceRadius = sourceSphere.transform.lossyScale.x / 2.0f;
         } 
         else  // RxnContainer
         {
-            sourceRadius = source.transform.localScale.x / 2.0f;
+            sourceRadius = source.transform.lossyScale.x / 2.0f;
         }
         // Target
         if (target.tag == "MolContainer")
         {
             GameObject targetSphere = target.transform.Find("NodeSpherePrefab(Clone)").gameObject;
-            targetRadius = targetSphere.transform.localScale.x / 2.0f;
+            targetRadius = targetSphere.transform.lossyScale.x / 2.0f;
         }
         else
         {
-            targetRadius = target.transform.localScale.x / 2.0f;
+            targetRadius = target.transform.lossyScale.x / 2.0f;
         }
 
         Vector3 directionToTarget = (target.transform.position - source.transform.position).normalized;

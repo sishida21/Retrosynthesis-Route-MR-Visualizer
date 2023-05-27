@@ -11,10 +11,10 @@ public class ReactionCreator : MonoBehaviour
     {
         GameObject sphere = Instantiate(nodeSphere);
         sphere.tag = "RxnContainer";
-        sphere.transform.SetParent(transform);
+        //sphere.transform.SetParent(transform);
         sphere.transform.Rotate(new Vector3(0, 0, 90));
         sphere.name = node.id;
-        sphere.transform.localScale = Vector3.one * 0.3f;
+        sphere.transform.localScale = Vector3.one * 0.2f;
 
         Rigidbody rb = sphere.AddComponent<Rigidbody>();
         rb.isKinematic = true;
@@ -24,9 +24,9 @@ public class ReactionCreator : MonoBehaviour
         DisplayInteraction interaction = sphere.AddComponent<DisplayInteraction>();
         interaction.textPrefab = textPrefab;
         string text = String.Format("<u>Reaction information</u>\n\n" +
-            $"<size=\"60\">{node.numExamples} <size=\"40\">examples\n" + 
-            $"<size=\"40\">Plausibility: <size=\"60\">{node.ffScore:f2}\n" +
-            $"<size=\"40\">Template Score: <size=\"60\">{node.templateScore:f2}");
+            $"<size=\"55\">{node.numExamples} <size=\"35\">examples\n" + 
+            $"<size=\"35\">Plausibility: <size=\"55\">{node.ffScore:f2}\n" +
+            $"<size=\"35\">Template Score: <size=\"55\">{node.templateScore:f2}");
         interaction.displayText = text;
         return sphere;
     }

@@ -9,6 +9,7 @@ TagManager:
   - MolManager
   - MolContainer
   - RxnContainer
+  - MainNetwork
   layers:
   - Default
   - TransparentFX

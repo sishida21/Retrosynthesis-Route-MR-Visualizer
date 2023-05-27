@@ -30,6 +30,6 @@ public class CameraController : MonoBehaviour
             center /= count;
         }
 
-        return center;
+        return center + 1.5f * Vector3.up;
     }
 }

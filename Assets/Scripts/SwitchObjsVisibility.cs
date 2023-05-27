@@ -30,7 +30,7 @@ public class SwitchObjsVisibility : MonoBehaviour
     private List<GameObject> GetAllMolObjectsWithTag(string tag)
     {
         List<GameObject> objects = new List<GameObject>();
-        GameObject molManager = GameObject.FindGameObjectWithTag("MolManager");
+        GameObject molManager = GameObject.FindGameObjectWithTag("MainNetwork");
         foreach (Transform child in molManager.transform)
         {
             foreach (Transform gChild in child.transform)
@@ -44,10 +44,4 @@ public class SwitchObjsVisibility : MonoBehaviour
         return objects;
 
     }
-
-    //// Update is called once per frame
-    //void Update()
-    //{
-    //    
-    //}
 }

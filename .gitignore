@@ -74,3 +74,4 @@ crashlytics-build.properties
 # Custom setting
 /Assets/Plugins/*
 !/Assets/Plugins/.gitkeep
+/AppBuild

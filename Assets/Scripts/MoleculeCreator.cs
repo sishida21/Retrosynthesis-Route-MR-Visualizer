@@ -7,9 +7,10 @@ using System.IO;
 
 public class MoleculeCreator: MonoBehaviour
 {
-    private float moleculeScale = 0.1f;
+    private float moleculeScale = 0.05f;
     public GameObject textPrefab;
     public GameObject nodeSphere;
+    //public GameObject mainNetwork;
 
     public struct Mol3D
     {
@@ -27,7 +28,8 @@ public class MoleculeCreator: MonoBehaviour
     {
         GameObject moleculeObject = new GameObject(nodeId);
         moleculeObject.tag = "MolContainer";
-        moleculeObject.transform.SetParent(transform);
+        //moleculeObject.transform.SetParent(mainNetwork.transform);
+        moleculeObject.transform.localScale = Vector3.one * 0.4f;
 
         OBConversion conv = new OBConversion();
         conv.SetInAndOutFormats("smi", "mol");
@@ -166,8 +168,8 @@ public class MoleculeCreator: MonoBehaviour
         //sphere.transform.position = bounds.center;
         sphere.transform.position = Vector3.zero;
         float maxScale = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 1.25f;
+        Debug.LogFormat("{0} {1}", maxScale, bounds.ToString());
         sphere.transform.localScale = Vector3.one * maxScale;
-        //sphereMaterial.color = new Color(1.0f, 1.0f, 1.0f, 0.3f);
         return sphere;
     }
 

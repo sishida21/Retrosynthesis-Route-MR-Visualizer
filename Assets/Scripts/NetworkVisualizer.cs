@@ -80,10 +80,10 @@ public class NetworkVisualizer : MonoBehaviour
     public EdgeCreator edgeCreator;
     public MoleculeCreator molCreator;
     public ReactionCreator reactionCreator;
-    public float range = 2;
     private Root root;
     public NetworkNode rootNode;
-    public string jsonFileName = "large_network";
+    public string jsonFileName = "medium_network";
+    public GameObject reactionNetwork;
 
     public Dictionary<string, GameObject> nodeObjectLookup = new Dictionary<string, GameObject>();
     Dictionary<string, GameObject> edgeObjectLookup = new Dictionary<string, GameObject>();
@@ -101,6 +101,7 @@ public class NetworkVisualizer : MonoBehaviour
 
     public void InitializeData()
     {
+        //GameObject reactionNetwork = new GameObject("ReactionNetwork");
         root = LoadJsonData(jsonFileName);
 
         foreach (DataNode node in root.dataGraph.nodes)
@@ -114,10 +115,12 @@ public class NetworkVisualizer : MonoBehaviour
             if (node.type == "chemical")
             {
                 GameObject molecule = molCreator.CreateMolecule(node.smiles, node.id);
+                molecule.transform.SetParent(reactionNetwork.transform);
                 nodeObjectLookup.Add(node.id, molecule);
             } else  // type == reaction
             {
                 GameObject reaction = reactionCreator.CreateTransparentSphere(nodeDataLookup[node.smiles]);
+                reaction.transform.SetParent(reactionNetwork.transform);
                 nodeObjectLookup.Add(node.id, reaction);
             }
         }
@@ -157,16 +160,19 @@ public class NetworkVisualizer : MonoBehaviour
             GameObject source = nodeObjectLookup[edge.from];
             GameObject target = nodeObjectLookup[edge.to];
             GameObject edgeObj = edgeCreator.CreateEdge(source, target);
+            edgeObj.transform.SetParent(reactionNetwork.transform);
             edgeObjectLookup.Add(edge.id, edgeObj);
         }
+        reactionNetwork.transform.localScale = Vector3.one * 0.4f;
     }
 
     public class ReactionNetwork
     {
         public NetworkNode rootNode;
-        public float verticalSpacing = 1.2f;
-        public float initialRadius = 6.0f;
-        public float radiusDecay = 0.6f;
+        public GameObject reactionNetwork = GameObject.FindGameObjectWithTag("MainNetwork");
+        public float verticalSpacing = 0.25f;
+        public float initialRadius = 1.0f;
+        public float radiusDecay = 0.85f;
 
         public ReactionNetwork(NetworkNode rootNode)
         {
@@ -180,7 +186,7 @@ public class NetworkVisualizer : MonoBehaviour
                 Debug.LogError("Root node is null");
                 return;
             }
-            rootNode.molObject.transform.position = Vector3.zero;
+            rootNode.molObject.transform.position = reactionNetwork.transform.position;
             PlaceNode(rootNode, initialRadius);
         }
 
@@ -224,7 +230,7 @@ public class NetworkVisualizer : MonoBehaviour
     private void OnApplicationQuit()
     {
         string dirPath = Path.Combine(Application.dataPath, "Resources/images/");
-        FileUtil.DeleteFileOrDirectory(dirPath);
+        //FileUtil.DeleteFileOrDirectory(dirPath);  // When building app, comment out this line.
         Directory.CreateDirectory(dirPath);
     }
 

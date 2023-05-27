@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class NodeForce : MonoBehaviour
 {
-    public float forceMultiplier = 0.8f;
-    public float maximumDistance = 1.5f;
-    public float stopDistance = 0.5f;
-    public float highDrag = 5.0f;
+    public float forceMultiplier = 0.5f;
+    public float maximumDistance = 0.3f;
+    public float stopDistance = 0.05f;
+    public float highDrag = 3.0f;
     public float lowDrag = 0.5f;
 
     private Rigidbody rb;
