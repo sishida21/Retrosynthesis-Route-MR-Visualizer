@@ -75,3 +75,8 @@ crashlytics-build.properties
 /Assets/Plugins/*
 !/Assets/Plugins/.gitkeep
 /AppBuild
+/Assets/Resources/images/*
+!/Assets/Resources/images/.gitkeep
+/Assets/Resources/molfiles/*
+!/Assets/Resources/molfiles/.gitkeep
+
