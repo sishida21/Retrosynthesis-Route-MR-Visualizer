@@ -114,7 +114,7 @@ public class NetworkVisualizer : MonoBehaviour
             nodeDispDataLookup.Add(node.id, node);
             if (node.type == "chemical")
             {
-                GameObject molecule = molCreator.CreateMolecule(node.smiles, node.id);
+                GameObject molecule = molCreator.CreateMolecule(node.id);
                 molecule.transform.SetParent(reactionNetwork.transform);
                 nodeObjectLookup.Add(node.id, molecule);
             } else  // type == reaction

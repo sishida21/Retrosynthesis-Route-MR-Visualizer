@@ -1,9 +1,69 @@
 using System.Collections.Generic;
 using UnityEngine;
-using OpenBabel;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.Input;
 using System.IO;
+
+public class Atom
+{
+    public string Element { get; set; }
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Z { get; set; }
+}
+
+public class Bond
+{
+    public int BeginAtom { get; set; }
+    public int EndAtom { get; set; }
+    public int Type { get; set; }
+}
+
+public class Molecule
+{
+    public List<Atom> Atoms { get; set; } = new List<Atom>();
+    public List<Bond> Bonds { get; set; } = new List<Bond>();
+}
+
+public class MoleculeLoader
+{
+    public static Molecule ReadMolecule(string molText)
+    {
+        Molecule molecule = new Molecule();
+        string[] lines = molText.Split('\n');
+
+        // Read atom count and bond count from line 4
+        string line = lines[3];
+        int atomCount = int.Parse(line.Substring(0, 3).Trim());
+        int bondCount = int.Parse(line.Substring(3, 3).Trim());
+
+        // Read atoms
+        for (int i = 0; i < atomCount; i++)
+        {
+            line = lines[4 + i];
+            Atom atom = new Atom();
+            atom.X = double.Parse(line.Substring(0, 10).Trim());
+            atom.Y = double.Parse(line.Substring(10, 10).Trim());
+            atom.Z = double.Parse(line.Substring(20, 10).Trim());
+            atom.Element = line.Substring(31, 3).Trim();
+            molecule.Atoms.Add(atom);
+        }
+
+        // Read bonds
+        for (int i = 0; i < bondCount; i++)
+        {
+            line = lines[4 + atomCount + i];
+            Bond bond = new Bond();
+            bond.BeginAtom = int.Parse(line.Substring(0, 3).Trim());
+            bond.EndAtom = int.Parse(line.Substring(3, 3).Trim());
+            bond.Type = int.Parse(line.Substring(6, 3).Trim());
+            molecule.Bonds.Add(bond);
+        }
+
+        return molecule;
+    }
+}
+
 
 public class MoleculeCreator: MonoBehaviour
 {
@@ -16,6 +76,7 @@ public class MoleculeCreator: MonoBehaviour
     {
         public GameObject objects;
         public Bounds bounds;
+        public int atomNum;
     }
 
     // Start is called before the first frame update
@@ -24,33 +85,19 @@ public class MoleculeCreator: MonoBehaviour
         //CreateMolecule(smilesString);
     }
 
-    public GameObject CreateMolecule(string smilesString, string nodeId)
+    public GameObject CreateMolecule(string nodeId)
     {
         GameObject moleculeObject = new GameObject(nodeId);
         moleculeObject.tag = "MolContainer";
         //moleculeObject.transform.SetParent(mainNetwork.transform);
         moleculeObject.transform.localScale = Vector3.one * 0.4f;
 
-        OBConversion conv = new OBConversion();
-        conv.SetInAndOutFormats("smi", "mol");
-        OBMol mol = new OBMol();
-        conv.ReadString(mol, smilesString);
-        OBBuilder builder = new OBBuilder();
-        builder.Build(mol);
-
-        OBForceField forceField = OBForceField.FindForceField("mmff94"); // mmff94, UFF
-        if (forceField != null )
-        {
-            forceField.Setup(mol);
-            forceField.SteepestDescent(500);
-            forceField.GetCoordinates(mol);
-        }
-        Mol3D mol3d = build3DMolecule(mol);
+        Mol3D mol3d = build3DMolecule(nodeId);
         mol3d.objects.transform.SetParent(moleculeObject.transform);
         GameObject sphere = createTransparentSphere(mol3d.bounds);
         sphere.transform.SetParent(moleculeObject.transform);
 
-        GameObject mol2d = draw2DMolecule(smilesString, nodeId);
+        GameObject mol2d = draw2DMolecule(nodeId, mol3d.atomNum);
         mol2d.transform.SetParent(moleculeObject.transform);
 
         Rigidbody rb = moleculeObject.AddComponent<Rigidbody>();
@@ -65,43 +112,33 @@ public class MoleculeCreator: MonoBehaviour
         return moleculeObject;
     }
 
-    private Texture2D PngToTex2D(string path)
-    {
-        BinaryReader binaryReader = new BinaryReader(new FileStream(path, FileMode.Open));
-        byte[] rb = binaryReader.ReadBytes((int)binaryReader.BaseStream.Length);
-        binaryReader.Close();
-        int pos = 16, width = 0, height = 0;
-        for (int i = 0; i < 4; i++) width = width * 256 + rb[pos++];
-        for (int i = 0; i < 4; i++) height = height * 256 + rb[pos++];
-        Texture2D texture = new Texture2D(width, height);
-        texture.LoadImage(rb);
-        return texture;
-    }
-
-    private Mol3D build3DMolecule(OBMol mol)
+    private Mol3D build3DMolecule(string nodeId)
     {
         GameObject moleculeObject = new GameObject("3D_molecule");
         moleculeObject.tag = "3dMol";
 
+        TextAsset molFile = Resources.Load<TextAsset>("molfiles/" + nodeId);
+        Molecule mol = MoleculeLoader.ReadMolecule(molFile.text);
+
         List<GameObject> atomObjects = new List<GameObject>();
-        for (int i = 1; i <= mol.NumAtoms(); ++i)
+        for (int i = 0; i < mol.Atoms.Count; ++i)
         {
-            OBAtom atom = mol.GetAtom(i);
-            string element = GetElementSymbol(atom.GetAtomicNum());
-            Vector3 position = new Vector3((float)atom.GetX(), (float)atom.GetY(), (float)atom.GetZ());
+            Atom atom = mol.Atoms[i];
+            string element = atom.Element;
+            Vector3 position = new Vector3((float)atom.X, (float)atom.Y, (float)atom.Z);
             GameObject atomObject = CreateAtomObject(element, position);
             atomObject.transform.SetParent(moleculeObject.transform);
             atomObjects.Add(atomObject);
         }
 
         List<GameObject> bondObjects;
-        for (int i = 0; i < mol.NumBonds(); ++i)
+        for (int i = 0; i < mol.Bonds.Count; ++i)
         {
-            OBBond bond = mol.GetBond(i);
-            uint start = bond.GetBeginAtomIdx();
-            uint end = bond.GetEndAtomIdx();
-            uint order = bond.GetBondOrder();
-            bondObjects = CreateBondObjects(atomObjects[(int)start - 1].transform.position, atomObjects[(int)end - 1].transform.position, order);
+            Bond bond = mol.Bonds[i];
+            int start = bond.BeginAtom;
+            int end = bond.EndAtom;
+            int order = bond.Type;
+            bondObjects = CreateBondObjects(atomObjects[start - 1].transform.position, atomObjects[end - 1].transform.position, order);
             foreach (GameObject bondObject in bondObjects)
             {
                 bondObject.transform.SetParent(moleculeObject.transform);
@@ -124,34 +161,27 @@ public class MoleculeCreator: MonoBehaviour
         Mol3D mol3d;
         mol3d.objects = moleculeObject;
         mol3d.bounds = bounds;
+        mol3d.atomNum = mol.Atoms.Count;
         return mol3d;
     }
 
-    private GameObject draw2DMolecule(string smilesString, string nodeId)
+    private GameObject draw2DMolecule(string nodeId, int atomNum)
     {
-        OBConversion conv = new OBConversion();
-        conv.SetInAndOutFormats("smi", "_png2");
-        OBMol mol = new OBMol();
-        conv.ReadString(mol, smilesString);
-        string filePath = Path.Combine(Application.dataPath, "Resources/images/", nodeId) + ".png";
-        // ref. https://open-babel.readthedocs.io/en/latest/FileFormats/PNG_2D_depiction.html
-        conv.AddOption("p", OBConversion.Option_type.OUTOPTIONS, "500");
-        conv.AddOption("b", OBConversion.Option_type.OUTOPTIONS, "none");
-        conv.AddOption("t", OBConversion.Option_type.OUTOPTIONS);
-        conv.AddOption("m", OBConversion.Option_type.OUTOPTIONS);
-        conv.WriteFile(mol, filePath);
-        conv.CloseOutFile();
-
-        Texture2D texture = PngToTex2D(filePath);
+        Texture2D texture = Resources.Load<Texture2D>("images/" + nodeId);
         GameObject pngObj = new GameObject("2D_molecule");
         pngObj.tag = "2dMol";
         pngObj.SetActive(false);
-        if (mol.NumAtoms() > 7)
+        if (atomNum > 15)
         {
             pngObj.transform.localScale = Vector3.one * moleculeScale * 2.5f;
-        } else
+        }
+        else if (atomNum > 7 || atomNum < 15)
         {
-            pngObj.transform.localScale = Vector3.one * moleculeScale * 1.0f;
+            pngObj.transform.localScale = Vector3.one * moleculeScale * 1.2f;
+        }
+        else
+        {
+            pngObj.transform.localScale = Vector3.one * moleculeScale * 0.8f;
         }
         pngObj.transform.position = Vector3.zero;
         pngObj.AddComponent<SpriteRenderer>();
@@ -211,7 +241,7 @@ public class MoleculeCreator: MonoBehaviour
         return atomObject;
     }
 
-    private List<GameObject> CreateBondObjects(Vector3 startPosition, Vector3 endPosition, uint order)
+    private List<GameObject> CreateBondObjects(Vector3 startPosition, Vector3 endPosition, int order)
     {
         List<GameObject> bondObjects = new List<GameObject>();
         Vector3 bondDirection = endPosition - startPosition;
@@ -244,30 +274,5 @@ public class MoleculeCreator: MonoBehaviour
         }
     
         return bondObjects;
-    }
-    
-    private static readonly string[] ElementSymbols = {
-        "",
-        "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne",
-        "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca",
-        "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",
-        "Ga", "Ge", "As", "Se", "Br", "Kr", "Rb", "Sr", "Y", "Zr",
-        "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn",
-        "Sb", "Te", "I", "Xe", "Cs", "Ba", "La", "Ce", "Pr", "Nd",
-        "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb",
-        "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg",
-        "Tl", "Pb", "Bi", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm",
-        "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg",
-        "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv",
-        "Ts", "Og"
-    };
-
-    private string GetElementSymbol(uint atomicNumber)
-    {
-        if (atomicNumber >= 0 && atomicNumber < ElementSymbols.Length)
-        {
-            return ElementSymbols[atomicNumber];
-        }
-        return ""; // Unknown element
     }
 }
