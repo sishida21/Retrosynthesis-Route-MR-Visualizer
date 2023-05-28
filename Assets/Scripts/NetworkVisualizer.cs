@@ -95,7 +95,7 @@ public class NetworkVisualizer : MonoBehaviour
         InitializeData();
         ReactionNetwork network = new ReactionNetwork(rootNode);
         network.PlaceNodes();
-        UpdateEdgePosition();
+        //UpdateEdgePosition();
     }
 
     public void InitializeData()
@@ -237,7 +237,8 @@ public class NetworkVisualizer : MonoBehaviour
         }
     }
 
-    //void Update()
-    //{
-    //}
+    void Update()
+    {
+        UpdateEdgePosition();
+    }
 }
