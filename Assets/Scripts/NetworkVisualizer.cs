@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
-using UnityEditor;
 
 [System.Serializable]
 public class DataNode
@@ -97,6 +95,7 @@ public class NetworkVisualizer : MonoBehaviour
         InitializeData();
         ReactionNetwork network = new ReactionNetwork(rootNode);
         network.PlaceNodes();
+        UpdateEdgePosition();
     }
 
     public void InitializeData()
@@ -227,15 +226,7 @@ public class NetworkVisualizer : MonoBehaviour
         return root;
     }
 
-    private void OnApplicationQuit()
-    {
-        string dirPath = Path.Combine(Application.dataPath, "Resources/images/");
-        //FileUtil.DeleteFileOrDirectory(dirPath);  // When building app, comment out this line.
-        Directory.CreateDirectory(dirPath);
-    }
-
-    // Update is called once per frame
-    void Update()
+    private void UpdateEdgePosition()
     {
         foreach (DispEdge edge in root.dispGraph.edges)
         {
@@ -245,4 +236,8 @@ public class NetworkVisualizer : MonoBehaviour
                 nodeObjectLookup[edge.to]);
         }
     }
+
+    //void Update()
+    //{
+    //}
 }

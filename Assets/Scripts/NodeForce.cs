@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class NodeForce : MonoBehaviour
@@ -9,15 +10,13 @@ public class NodeForce : MonoBehaviour
     public float lowDrag = 0.5f;
 
     private Rigidbody rb;
+    private List<GameObject> nodes;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-    }
+        nodes = new List<GameObject>(GameObject.FindGameObjectsWithTag("MolContainer"));
 
-    void FixedUpdate()
-    {
-        GameObject[] nodes = GameObject.FindGameObjectsWithTag("MolContainer");
         bool shouldMove = false;
 
         foreach (GameObject node in nodes)

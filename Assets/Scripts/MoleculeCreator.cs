@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.Input;
-using System.IO;
+
 
 public class Atom
 {
@@ -77,12 +77,6 @@ public class MoleculeCreator: MonoBehaviour
         public GameObject objects;
         public Bounds bounds;
         public int atomNum;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        //CreateMolecule(smilesString);
     }
 
     public GameObject CreateMolecule(string nodeId)
