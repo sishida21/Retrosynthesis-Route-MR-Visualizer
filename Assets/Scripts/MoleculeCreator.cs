@@ -67,7 +67,7 @@ public class MoleculeLoader
 
 public class MoleculeCreator: MonoBehaviour
 {
-    private float moleculeScale = 0.05f;
+    private float moleculeScale = 0.03f;
     public GameObject textPrefab;
     public GameObject nodeSphere;
     //public GameObject mainNetwork;
@@ -96,10 +96,12 @@ public class MoleculeCreator: MonoBehaviour
 
         Rigidbody rb = moleculeObject.AddComponent<Rigidbody>();
         rb.useGravity = false;
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
         BoxCollider boxCollider = moleculeObject.AddComponent<BoxCollider>();
         boxCollider.size = moleculeObject.transform.InverseTransformVector(mol3d.bounds.size);
         moleculeObject.AddComponent<ObjectManipulator>();
         moleculeObject.AddComponent<NearInteractionGrabbable>();
+        moleculeObject.AddComponent<FreezeRotationOnRelease>();
         moleculeObject.AddComponent<NodeForce>();
 
         return moleculeObject;
