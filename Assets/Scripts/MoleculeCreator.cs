@@ -101,7 +101,6 @@ public class MoleculeCreator: MonoBehaviour
         moleculeObject.AddComponent<ObjectManipulator>();
         moleculeObject.AddComponent<NearInteractionGrabbable>();
         moleculeObject.AddComponent<NodeForce>();
-        Debug.Log("Molecule creation complete");
 
         return moleculeObject;
     }
@@ -192,7 +191,6 @@ public class MoleculeCreator: MonoBehaviour
         //sphere.transform.position = bounds.center;
         sphere.transform.position = Vector3.zero;
         float maxScale = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 1.25f;
-        Debug.LogFormat("{0} {1}", maxScale, bounds.ToString());
         sphere.transform.localScale = Vector3.one * maxScale;
         return sphere;
     }
@@ -230,7 +228,11 @@ public class MoleculeCreator: MonoBehaviour
         atomObject.transform.position = position;
     
         Color elementColor = GetElementColor(element);
-        atomObject.GetComponent<Renderer>().material.color = elementColor;
+
+        MeshRenderer meshRenderer = atomObject.GetComponent<MeshRenderer>();
+        meshRenderer.material.color = elementColor;
+        meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        meshRenderer.receiveShadows = false;
     
         return atomObject;
     }
@@ -263,6 +265,10 @@ public class MoleculeCreator: MonoBehaviour
             bondObject.transform.position = bondCenter;
             bondObject.transform.localScale = new Vector3(0.1f, bondLength / 2, 0.1f);
             bondObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, bondDirection);
+
+            MeshRenderer meshRenderer = bondObject.GetComponent<MeshRenderer>();
+            meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            meshRenderer.receiveShadows = false;
     
             bondObjects.Add(bondObject);
         }

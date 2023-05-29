@@ -17,6 +17,8 @@ public class EdgeCreator : MonoBehaviour
     {
         GameObject edge = new GameObject("Edge" + source.name + "_" + target.name);
         LineRenderer line = edge.AddComponent<LineRenderer>();
+        line.receiveShadows = false;
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         edge.transform.localScale = Vector3.one * 0.1f;
 
         line.material = edgeMaterial;
