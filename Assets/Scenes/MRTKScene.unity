@@ -326,6 +326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodeSphere: {fileID: 7558972179936895413, guid: 45bb4b757b342034ea8aa1c1c99d75cc, type: 3}
   textPrefab: {fileID: 4947564431550615312, guid: d2209df63337c2442869dd3672509569, type: 3}
+  scale: 0.05
 --- !u!4 &725182524
 Transform:
   m_ObjectHideFlags: 0
@@ -365,7 +366,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 752645746}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 1.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -633,6 +634,8 @@ MonoBehaviour:
   reactionCreator: {fileID: 725182523}
   jsonFileName: large_network
   reactionNetwork: {fileID: 752645746}
+  source: {fileID: 0}
+  target: {fileID: 0}
 --- !u!4 &1618279244
 Transform:
   m_ObjectHideFlags: 0

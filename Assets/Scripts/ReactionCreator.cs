@@ -7,6 +7,7 @@ public class ReactionCreator : MonoBehaviour
 {
     public GameObject nodeSphere;
     public GameObject textPrefab;
+    public float scale = 0.05f;
     public GameObject CreateTransparentSphere(DataNode node)
     {
         GameObject sphere = Instantiate(nodeSphere);
@@ -14,7 +15,7 @@ public class ReactionCreator : MonoBehaviour
         //sphere.transform.SetParent(transform);
         sphere.transform.Rotate(new Vector3(0, 0, 90));
         sphere.name = node.id;
-        sphere.transform.localScale = Vector3.one * 0.2f;
+        sphere.transform.localScale = Vector3.one * scale;
 
         Rigidbody rb = sphere.AddComponent<Rigidbody>();
         rb.isKinematic = true;
