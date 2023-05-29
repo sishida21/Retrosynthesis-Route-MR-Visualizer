@@ -63,6 +63,9 @@ public class NetworkNode
 {
     public List<NetworkNode> children = new List<NetworkNode>();
     public GameObject molObject;
+    public Vector3 previousPosition;
+    public List<DispEdge> connectedEdges = new List<DispEdge>();
+
     public NetworkNode(GameObject molObject)
     {
         this.molObject = molObject;
@@ -70,6 +73,11 @@ public class NetworkNode
     public void AddChild(NetworkNode child)
     {
         children.Add(child);
+    }
+    public void SetPosition(Vector3 newPosition)
+    {
+        this.molObject.transform.position = newPosition;
+        this.previousPosition = newPosition;
     }
 }
 
@@ -82,6 +90,7 @@ public class NetworkVisualizer : MonoBehaviour
     public NetworkNode rootNode;
     public string jsonFileName = "medium_network";
     public GameObject reactionNetwork;
+    private float startTime;
 
     public Dictionary<string, GameObject> nodeObjectLookup = new Dictionary<string, GameObject>();
     Dictionary<string, GameObject> edgeObjectLookup = new Dictionary<string, GameObject>();
@@ -95,7 +104,7 @@ public class NetworkVisualizer : MonoBehaviour
         InitializeData();
         ReactionNetwork network = new ReactionNetwork(rootNode);
         network.PlaceNodes();
-        //UpdateEdgePosition();
+        startTime = Time.time;
     }
 
     public void InitializeData()
@@ -148,7 +157,6 @@ public class NetworkVisualizer : MonoBehaviour
             }
             if (edge.from == "00000000-0000-0000-0000-000000000000")
             {
-                Debug.Log("Root node found");
                 rootNode = sNode;
             }
             sNode.AddChild(tNode);
@@ -158,9 +166,13 @@ public class NetworkVisualizer : MonoBehaviour
         {
             GameObject source = nodeObjectLookup[edge.from];
             GameObject target = nodeObjectLookup[edge.to];
+            NetworkNode sNode = networkNodeLookup[edge.from];
+            NetworkNode tNode = networkNodeLookup[edge.to];
             GameObject edgeObj = edgeCreator.CreateEdge(source, target);
             edgeObj.transform.SetParent(reactionNetwork.transform);
             edgeObjectLookup.Add(edge.id, edgeObj);
+            sNode.connectedEdges.Add(edge);
+            tNode.connectedEdges.Add(edge);
         }
         reactionNetwork.transform.localScale = Vector3.one * 0.4f;
     }
@@ -208,7 +220,7 @@ public class NetworkVisualizer : MonoBehaviour
                         -verticalSpacing,
                         currentRadius * Mathf.Sin(angle));
                 }
-                child.molObject.transform.position = node.molObject.transform.position + newPosition;
+                child.SetPosition(node.molObject.transform.position + newPosition);
             }
 
             float nextRadius = currentRadius * radiusDecay;
@@ -226,15 +238,53 @@ public class NetworkVisualizer : MonoBehaviour
         return root;
     }
 
+    public GameObject source;
+    public GameObject target;
+    public NetworkNode sNode;
+    public NetworkNode tNode;
     private void UpdateEdgePosition()
     {
         foreach (DispEdge edge in root.dispGraph.edges)
         {
-            edgeCreator.UpdateEdgePosition(
-                edgeObjectLookup[edge.id],
-                nodeObjectLookup[edge.from],
-                nodeObjectLookup[edge.to]);
+            source = nodeObjectLookup[edge.from];
+            target = nodeObjectLookup[edge.to];
+            sNode = networkNodeLookup[edge.from];
+            tNode = networkNodeLookup[edge.to];
+            if (Time.time - startTime < 2.0f)
+            {
+                sNode.previousPosition = source.transform.position;
+                tNode.previousPosition = target.transform.position;
+                edgeCreator.UpdateEdgePosition(edgeObjectLookup[edge.id], source, target);
+                continue;
+            }
+            if (sNode.previousPosition != source.transform.position)
+            {
+                UpdateConnectedEdgesPositions(sNode);
+            }
+            if (tNode.previousPosition != target.transform.position)
+            {
+                UpdateConnectedEdgesPositions(tNode);
+            }
         }
+    }
+
+    private void UpdateConnectedEdgesPositions(NetworkNode node)
+    {
+        GameObject _source;
+        GameObject _target;
+        NetworkNode _sNode;
+        NetworkNode _tNode;
+        foreach (DispEdge _edge in node.connectedEdges)
+        {
+            _source = nodeObjectLookup[_edge.from];
+            _target = nodeObjectLookup[_edge.to];
+            _sNode = networkNodeLookup[_edge.from];
+            _tNode = networkNodeLookup[_edge.to];
+            edgeCreator.UpdateEdgePosition(edgeObjectLookup[_edge.id], _source, _target);
+            _sNode.previousPosition = _source.transform.position;
+            _tNode.previousPosition = _target.transform.position;
+        }
+        //Debug.Log("Update Edge");
     }
 
     void Update()
