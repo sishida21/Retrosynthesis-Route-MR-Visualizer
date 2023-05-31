@@ -19,11 +19,11 @@ public class EdgeCreator : MonoBehaviour
         LineRenderer line = edge.AddComponent<LineRenderer>();
         line.receiveShadows = false;
         line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        edge.transform.localScale = Vector3.one * 0.001f;
+        edge.transform.localScale = Vector3.one * 0.1f;
 
         line.material = edgeMaterial;
-        line.startWidth = 0.001f;
-        line.endWidth = 0.001f;
+        line.startWidth = 0.005f;
+        line.endWidth = 0.005f;
         line.positionCount = 2;
 
         line.SetPosition(0, source.transform.position);

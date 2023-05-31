@@ -67,7 +67,7 @@ public class MoleculeLoader
 
 public class MoleculeCreator: MonoBehaviour
 {
-    private float moleculeScale = 0.03f;
+    private float moleculeScale = 0.035f;
     public GameObject textPrefab;
     public GameObject nodeSphere;
     //public GameObject mainNetwork;
@@ -102,6 +102,7 @@ public class MoleculeCreator: MonoBehaviour
         moleculeObject.AddComponent<ObjectManipulator>();
         moleculeObject.AddComponent<NearInteractionGrabbable>();
         moleculeObject.AddComponent<FreezeRotationOnRelease>();
+        moleculeObject.AddComponent<StopMotionOnRelease>();
         moleculeObject.AddComponent<NodeForce>();
 
         return moleculeObject;

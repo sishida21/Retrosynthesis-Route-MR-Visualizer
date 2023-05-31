@@ -135,7 +135,9 @@ PlayerSettings:
     16:9: 1
     Others: 1
   bundleVersion: 0.1
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 5754495742676549688, guid: b93e12a9f6010a043bba9a771ebd8c97, type: 2}
+  - {fileID: 219414107269058326, guid: c0df58f71304f0e479a5aec18f83fe9a, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -653,11 +655,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: Retrosynthesis-Route-MR-Visualizer
   metroPackageVersion: 1.0.0.0
-  metroCertificatePath: 
+  metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: DefaultCompany
+  metroCertificateIssuer: DefaultCompany
+  metroCertificateNotAfter: 00cb4ed4b8aeda01
   metroApplicationDescription: Template_3D
   wsaImages: {}
   metroTileShortName: Retrosynthesis-Route-MR-Visualizer

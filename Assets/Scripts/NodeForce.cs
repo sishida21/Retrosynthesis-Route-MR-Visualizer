@@ -4,9 +4,9 @@ using UnityEngine;
 public class NodeForce : MonoBehaviour
 {
     public float forceMultiplier = 0.05f;
-    public float maximumDistance = 0.05f;
+    public float maximumDistance = 0.50f;
     public float stopDistance = 0.01f;
-    public float highDrag = 1.0f;
+    public float highDrag = 2.0f;
     public float lowDrag = 0.5f;
 
     private Rigidbody rb;

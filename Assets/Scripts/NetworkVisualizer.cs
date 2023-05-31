@@ -127,7 +127,7 @@ public class NetworkVisualizer : MonoBehaviour
                 nodeObjectLookup.Add(node.id, molecule);
             } else  // type == reaction
             {
-                GameObject reaction = reactionCreator.CreateTransparentSphere(nodeDataLookup[node.smiles]);
+                GameObject reaction = reactionCreator.CreateTransparentSphere(nodeDataLookup[node.smiles], node.id);
                 reaction.transform.SetParent(reactionNetwork.transform);
                 nodeObjectLookup.Add(node.id, reaction);
             }
@@ -181,9 +181,9 @@ public class NetworkVisualizer : MonoBehaviour
     {
         public NetworkNode rootNode;
         public GameObject reactionNetwork = GameObject.FindGameObjectWithTag("MainNetwork");
-        public float verticalSpacing = 0.10f;
-        public float initialRadius = 0.5f;
-        public float radiusDecay = 0.80f;
+        public float verticalSpacing = 0.14f;
+        public float initialRadius = 0.45f;
+        public float radiusDecay = 0.85f;
 
         public ReactionNetwork(NetworkNode rootNode)
         {
