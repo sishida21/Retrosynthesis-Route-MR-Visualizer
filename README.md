@@ -24,3 +24,7 @@ In addition, you must preprocess the file using https://github.com/sishida21/par
 ## Build and Deploy
 
 To build the application, please refer to the following link [Build and deploy to the HoloLens](https://learn.microsoft.com/en-us/windows/mixed-reality/develop/unity/build-and-deploy-to-hololens).
+
+## License
+
+This repository is distributed under the GPL-2.0 License. 
